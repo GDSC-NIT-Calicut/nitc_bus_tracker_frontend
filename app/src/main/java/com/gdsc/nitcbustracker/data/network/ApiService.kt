@@ -24,6 +24,9 @@ interface ApiService {
     @GET("/api/bus/get")
     suspend fun getBusDetails(@Query("busId") busId: String): Response<Bus>
 
+    @GET("/api/bus-statuses/get")
+    suspend fun getBusStatuses(): Response<List<BusStatus>>
+
     @POST("/api/bus-statuses/post")
     suspend fun postBusStatuses(@Body busStatus: BusStatus): Response<GenericResponse>
 
@@ -35,6 +38,18 @@ interface ApiService {
 
     @GET("/api/notices/get")
     suspend fun getNotices(): Response<List<Notice>>
+
+    @POST("/api/notices/post")
+    suspend fun updateNotices(@Body notices: Notice): Response<GenericResponse>
+
+    @POST("/api/notifications/both")
+    fun sendNotificationBoth(@Body request: Notice): Call<Void>
+
+    @POST("/api/notifications/driver")
+    fun sendNotificationDriver(@Body request: Notice): Call<Void>
+
+    @POST("/api/notifications/student")
+    fun sendNotificationStudent(@Body request: Notice): Call<Void>
 
     @GET("/api/route-stops/get/{route_id}")
     suspend fun getRouteStops(@Path("route_id") routeId: Int): Response<List<RouteStop>>

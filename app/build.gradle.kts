@@ -7,6 +7,8 @@ plugins {
 android {
     namespace = "com.gdsc.nitcbustracker"
     compileSdk = 35
+    val apiBaseUrl: String = project.findProperty("API_BASE_URL") as String? ?: "http://1234:3030/"
+
 
     packaging {
         resources {
@@ -26,6 +28,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resValue("string", "google_maps_key", (project.properties["MAPS_API_KEY"] ?: "").toString())
+        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
     }
 
     buildTypes {
@@ -46,6 +49,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
