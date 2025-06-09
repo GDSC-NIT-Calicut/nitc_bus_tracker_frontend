@@ -75,16 +75,7 @@ class StudentProfileFragment : Fragment() {
                 .setNegativeButton("No", null)
                 .show()
 
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.apply {
-                setTextColor(resources.getColor(R.color.white))
-                setBackgroundColor(resources.getColor(R.color.black))
-            }
-            dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.apply {
-                setTextColor(resources.getColor(R.color.white))
-                setBackgroundColor(resources.getColor(R.color.black))
-            }
-
-            dialog.window?.setBackgroundDrawableResource(R.drawable.rounded_border)
+            dialog.window?.setBackgroundDrawableResource(R.drawable.rounded_card)
 
         }
 
