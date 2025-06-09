@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.messaging.FirebaseMessaging
 
 class StudentActivity : AppCompatActivity() {
 
@@ -60,6 +61,13 @@ class StudentActivity : AppCompatActivity() {
             showFragment(fragmentToShow)
             true
         }
+
+        FirebaseMessaging.getInstance().subscribeToTopic("notifications-student")
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("FCM", "Subscribed to notifications-student topic")
+                }
+            }
     }
 
     private fun showFragment(fragmentToShow: Fragment) {

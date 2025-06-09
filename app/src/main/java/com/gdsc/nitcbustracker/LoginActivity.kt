@@ -23,6 +23,7 @@ import androidx.core.content.edit
 import com.gdsc.nitcbustracker.data.model.LoginRequest
 import com.gdsc.nitcbustracker.data.network.RetrofitClient
 import com.google.android.material.button.MaterialButton
+import com.google.firebase.messaging.FirebaseMessaging
 
 class LoginActivity : AppCompatActivity() {
 
@@ -112,6 +113,12 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
+        FirebaseMessaging.getInstance().subscribeToTopic("notifications")
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("FCM", "Subscribed to notifications")
+                }
+            }
 
         btnGoogleSignIn.setOnClickListener {
             googleSignInClient.signOut()

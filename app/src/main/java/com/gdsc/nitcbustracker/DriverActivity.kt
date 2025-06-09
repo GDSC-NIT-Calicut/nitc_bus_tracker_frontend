@@ -1,9 +1,11 @@
 package com.gdsc.nitcbustracker
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.messaging.FirebaseMessaging
 
 class DriverActivity : AppCompatActivity() {
 
@@ -55,6 +57,13 @@ class DriverActivity : AppCompatActivity() {
             showFragment(fragmentToShow)
             true
         }
+
+        FirebaseMessaging.getInstance().subscribeToTopic("notifications-driver")
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("FCM", "Subscribed to notifications-driver topic")
+                }
+            }
     }
 
     private fun showFragment(fragmentToShow: Fragment) {

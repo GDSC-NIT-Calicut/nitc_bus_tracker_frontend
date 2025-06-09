@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services")
 }
 android {
     namespace = "com.gdsc.nitcbustracker"
@@ -96,4 +97,6 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.material3)
     implementation(libs.blurry)
+    implementation(libs.google.services)
+    implementation(libs.firebase.messaging)
 }
