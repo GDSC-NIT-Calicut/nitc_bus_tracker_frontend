@@ -8,6 +8,15 @@ android {
     namespace = "com.gdsc.nitcbustracker"
     compileSdk = 35
 
+    packaging {
+        resources {
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/io.netty.versions.properties"
+        }
+    }
+
+
     defaultConfig {
         applicationId = "com.gdsc.nitcbustracker"
         minSdk = 24
@@ -56,4 +65,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 }
