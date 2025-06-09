@@ -1,14 +1,24 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
-
 android {
     namespace = "com.gdsc.nitcbustracker"
     compileSdk = 35
-    val apiBaseUrl: String = project.findProperty("API_BASE_URL") as String? ?: "http://1234:3030/"
 
+    // Load local.properties safely
+    val localProps = Properties().apply {
+        val localPropsFile = rootProject.file("local.properties")
+        if (localPropsFile.exists()) {
+            load(localPropsFile.inputStream())
+        }
+    }
+
+    val apiBaseUrl: String = localProps.getProperty("API_BASE_URL") ?: "http://fallback.url/"
+    val mapsApiKey: String = localProps.getProperty("MAPS_API_KEY") ?: ""
 
     packaging {
         resources {
@@ -18,7 +28,6 @@ android {
         }
     }
 
-
     defaultConfig {
         applicationId = "com.gdsc.nitcbustracker"
         minSdk = 24
@@ -27,7 +36,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        resValue("string", "google_maps_key", (project.properties["MAPS_API_KEY"] ?: "").toString())
+        resValue("string", "google_maps_key", mapsApiKey)
         buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
     }
 
@@ -40,13 +49,16 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
         buildConfig = true
@@ -84,5 +96,4 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.material3)
     implementation(libs.blurry)
-
 }
