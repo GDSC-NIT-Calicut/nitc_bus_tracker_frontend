@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_driver"
+        android:icon="@drawable/ic_tracking_icon"
+        android:title="Tracking" />
+
+    <item
+        android:id="@+id/nav_driver_notice"
+        android:icon="@drawable/ic_notice_icon"
+        android:title="Notice" />
+
+    <item
+        android:id="@+id/nav_driver_profile"
+        android:icon="@drawable/empty_profile_pic"
+        android:title="Profile" />
+
+</menu>

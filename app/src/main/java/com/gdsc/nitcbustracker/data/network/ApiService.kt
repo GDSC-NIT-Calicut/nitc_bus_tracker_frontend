@@ -11,6 +11,8 @@ import com.gdsc.nitcbustracker.data.model.RegisterRequest
 import com.gdsc.nitcbustracker.data.model.RouteStop
 import com.gdsc.nitcbustracker.data.model.Stop
 import com.gdsc.nitcbustracker.data.model.UserInfo
+import okhttp3.ResponseBody
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -27,6 +29,9 @@ interface ApiService {
 
     @GET("/api/location/get-buses")
     suspend fun getLocations(): Response<List<BusLocation>>
+
+    @POST("/api/location/post")
+    fun sendLocation(@Body busLocation: BusLocation): Call<ResponseBody>
 
     @GET("/api/notices/get")
     suspend fun getNotices(): Response<List<Notice>>
@@ -51,7 +56,5 @@ interface ApiService {
 
     @POST("/api/user/partial-registration")
     suspend fun partialRegistration(@Body request: Map<String, String>): Response<Map<String, Any>>
-
-
 
 }
