@@ -1,0 +1,106 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Google Map Fragment -->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Top Title -->
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:contentDescription="gradient"
+        android:src="@drawable/white_to_transparent_gradient"/>
+
+    <TextView
+        android:textColor="@color/black"
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:layout_marginBottom="32dp"
+        android:textSize="40sp"
+        android:text="Tracking"
+        android:gravity="center"
+        android:layout_marginTop="32dp" />
+
+    <!-- Status Card Overlay -->
+    <LinearLayout
+        android:id="@+id/status_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:background="@drawable/rounded_card"
+        android:layout_margin="16dp"
+        android:padding="16dp"
+        android:elevation="8dp">
+
+        <!-- ETA and Stops -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:textColor="@color/black"
+                android:text="ETA Next Stop"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"/>
+            <TextView
+                android:textColor="@color/black"
+                android:id="@+id/eta_text_view"
+                android:text="5 min"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"/>
+            <TextView
+                android:textColor="@color/black"
+                android:id="@+id/current_stop_text"
+                android:text="Current Stop: "
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textSize="16sp"/>
+            <TextView
+                android:textColor="@color/black"
+                android:id="@+id/next_stop_text"
+                android:text="Next Stop: "
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textSize="16sp"/>
+        </LinearLayout>
+
+        <!-- Status -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <TextView
+                android:textColor="@color/black"
+                android:text="Status"
+                android:textStyle="bold"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textSize="12sp"/>
+            <TextView
+                android:textColor="@color/black"
+                android:id="@+id/runningStatus"
+                android:text="Running"
+                android:textSize="20sp"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:textStyle="bold"/>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>
