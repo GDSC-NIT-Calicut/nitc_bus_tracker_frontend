@@ -2,12 +2,16 @@ package com.gdsc.nitcbustracker
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -34,6 +38,14 @@ class RegisterActivity : AppCompatActivity() {
         etPhone = findViewById(R.id.etPhone)
         btnRegister = findViewById(R.id.btnRegister)
         spinnerRole = findViewById(R.id.spinnerRole)
+        
+        val rootView = findViewById<View>(R.id.register_layout)
+        ViewCompat.setOnApplyWindowInsetsListener(rootView) { view, insets ->
+            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            view.updatePadding(top = statusBarHeight)
+            insets
+        }
+
         val account: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(this)
         val prefillEmail = intent.getStringExtra("prefill_email")
         val prefillName = intent.getStringExtra("prefill_name")
