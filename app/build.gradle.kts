@@ -12,7 +12,7 @@ android {
 
     // Load local.properties safely
     val localProps = Properties().apply {
-        val localPropsFile = rootProject.file("local.properties")
+        val localPropsFile = rootProject.file("app/local.properties")
         if (localPropsFile.exists()) {
             load(localPropsFile.inputStream())
         }
