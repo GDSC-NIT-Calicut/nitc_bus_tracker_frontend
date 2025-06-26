@@ -94,7 +94,8 @@ class DriverTrackingFragment : Fragment(), OnMapReadyCallback {
                 val loc = BusLocation(
                     bus_id = selectedHostel,
                     latitude = location.latitude,
-                    longitude = location.longitude
+                    longitude = location.longitude,
+                    timestamp = location.time.toString()
                 )
                 api.sendLocation(loc).enqueue(object : Callback<ResponseBody> {
                     override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {

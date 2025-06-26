@@ -118,7 +118,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     val locationsResponse = RetrofitClient.api.getLocations()
                     if (locationsResponse.isSuccessful) {
                         val rawLocations = locationsResponse.body() ?: emptyList()
-                        lastLocations = rawLocations.distinctBy { it.bus_id }
+                        lastLocations = rawLocations
+                            .groupBy { it.bus_id }
+                            .map { (_, list) -> list.maxByOrNull { it.timestamp }!! }
+
 
                         val busDetailsList = lastLocations.map { location ->
                             async {
