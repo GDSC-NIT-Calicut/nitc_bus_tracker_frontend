@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -74,8 +75,8 @@ class AdminProfileFragment : Fragment() {
             val sharedPref = requireActivity().getSharedPreferences("app_prefs", MODE_PRIVATE)
 
             val dialog = AlertDialog.Builder(requireContext())
-                .setTitle("Logout")
-                .setMessage("Are you sure you want to logout?")
+                .setTitle(Html.fromHtml("<font color='#000000'>Logout</font>"))
+                .setMessage(Html.fromHtml("<font color='#000000'>Are you sure you want to logout?</font>"))
                 .setPositiveButton("Yes") { dialog, _ ->
                     sharedPref.edit { clear() }
                     goToLogin()
