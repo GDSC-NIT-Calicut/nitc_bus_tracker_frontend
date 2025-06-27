@@ -52,7 +52,6 @@ class RegisterActivity : AppCompatActivity() {
         if (!prefillEmail.isNullOrEmpty() && !prefillName.isNullOrEmpty()) {
             etEmail.setText(prefillEmail)
             etName.setText(prefillName)
-            etEmail.isEnabled = false
             etName.isEnabled = false
         }
         val role = "student"
