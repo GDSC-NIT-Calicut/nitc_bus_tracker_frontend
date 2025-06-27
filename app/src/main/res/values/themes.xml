@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.NITCBusTracker" parent="Theme.Material3.DynamicColors.Light.NoActionBar" >
-    <item name="android:statusBarColor">@color/white</item>
-    <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="materialButtonStyle">@style/BlackMaterialButton</item>
     </style>
 
     <style name="RoundedImage" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">60dp</item> <!-- half of width/height for a circle -->
+    </style>
+
+    <!-- Default MaterialButton style -->
+    <style name="BlackMaterialButton" parent="Widget.Material3.Button">
+        <item name="backgroundTint">#000000</item>
+        <item name="android:textColor">#FFFFFF</item> <!-- Optional: make text white -->
     </style>
 </resources>

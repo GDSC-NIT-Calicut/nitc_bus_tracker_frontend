@@ -94,6 +94,7 @@
             android:layout_height="wrap_content"
             android:text="Remember me"
             android:textColor="#222"
+            android:layout_gravity="start"
             android:layout_marginBottom="18dp"/>
 
         <!-- Login Button -->
@@ -140,18 +141,17 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnGoogleSignIn"
+            android:textSize="16dp"
             android:background="@drawable/rounded_except_top_right"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Sign in with NITC Email"
             android:textColor="@color/white"
-            android:backgroundTint="@android:color/white"
             android:elevation="0dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"
             android:paddingVertical="12dp"
             android:paddingHorizontal="16dp"
-            app:cornerRadius="12dp"
             app:icon="@drawable/ic_google_logo"
             app:iconGravity="textStart"
             app:iconPadding="12dp" />
