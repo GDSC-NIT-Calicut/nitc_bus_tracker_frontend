@@ -57,7 +57,7 @@ class LoginActivity : AppCompatActivity() {
         etUsername = findViewById(R.id.etUsername)
         etPassword = findViewById(R.id.etPassword)
         btnLogin = findViewById(R.id.btnLogin)
-        val btnGoogleSignIn = findViewById<SignInButton>(R.id.btnGoogleSignIn)
+        val btnGoogleSignIn = findViewById<MaterialButton>(R.id.btnGoogleSignIn)
 
         rememberMeCheckbox = findViewById(R.id.cbRememberMe)
 
