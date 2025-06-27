@@ -14,17 +14,17 @@
         android:scaleType="centerCrop"
         android:src="@drawable/login_background"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/loginCard"
+        app:layout_constraintBottom_toTopOf="@+id/loginScroll"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.4"/>
+        app:layout_constraintHeight_percent="0.3"/>
 
-    <!-- Login Card -->
+    <!-- Logo Image -->
     <ImageView
         android:id="@+id/logoImage"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:layout_marginBottom="120dp"
+        android:layout_marginBottom="40dp"
         android:background="@drawable/rounded_except_top_right"
         android:padding="8dp"
         android:scaleType="centerInside"
@@ -34,135 +34,146 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/loginCard"
+    <!-- Login Card in ScrollView -->
+    <ScrollView
+        android:id="@+id/loginScroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:orientation="vertical"
-        android:background="@drawable/rounded_on_top_left"
-        android:padding="24dp"
-        android:gravity="center_horizontal"
         app:layout_constraintTop_toBottomOf="@id/bgImage"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:fillViewport="true">
 
-        <TextView
-            android:id="@+id/tvLoginTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Login"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
-            android:layout_marginBottom="20dp"/>
-
-        <!-- Email -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etUsername"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Email"
-                android:inputType="textEmailAddress"
-                android:textSize="16sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Password -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:endIconMode="password_toggle">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Password"
-                android:inputType="textPassword"
-                android:textSize="16sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <CheckBox
-            android:id="@+id/cbRememberMe"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Remember me"
-            android:textColor="#222"
-            android:layout_gravity="start"
-            android:layout_marginBottom="18dp"/>
-
-        <!-- Login Button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnLogin"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/rounded_except_top_right"
-            android:backgroundTint="@color/black"
-            android:text="Login"
-            android:textColor="@android:color/white"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:layout_marginBottom="14dp"/>
-
-        <!-- Divider -->
         <LinearLayout
+            android:id="@+id/loginCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="14dp">
+            android:orientation="vertical"
+            android:background="@drawable/rounded_on_top_left"
+            android:padding="24dp"
+            android:gravity="center_horizontal">
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:background="#888"/>
+            <TextView
+                android:id="@+id/tvLoginTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Login"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="20dp"/>
 
+            <!-- Email -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etUsername"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Email"
+                    android:inputType="textEmailAddress"
+                    android:textSize="16sp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Password -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:endIconMode="password_toggle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:textSize="16sp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <CheckBox
+                android:id="@+id/cbRememberMe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Remember me"
+                android:textColor="#222"
+                android:layout_gravity="start"
+                android:layout_marginBottom="18dp"/>
+
+            <!-- Login Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/rounded_except_top_right"
+                android:backgroundTint="@color/black"
+                android:text="Login"
+                android:textColor="@android:color/white"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Divider -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="#888"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="or"
+                    android:textColor="#888"
+                    android:textSize="14sp"
+                    android:layout_marginHorizontal="12dp"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="#888"/>
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:textSize="16sp"
+                android:id="@+id/btnGoogleSignIn"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Sign in with NITC Email"
+                android:textColor="@android:color/black"
+                android:background="@drawable/rounded_except_top_right"
+                app:backgroundTint="@null"
+                android:elevation="0dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="16dp"
+                app:icon="@drawable/ic_google_logo"
+                app:iconGravity="textStart"
+                app:iconTint="@color/black"
+                app:iconPadding="12dp" />
+
+
+
+            <!-- Terms -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="or"
-                android:textColor="#888"
-                android:textSize="14sp"
-                android:layout_marginHorizontal="12dp"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:background="#888"/>
+                android:text="By Logging in you agree to our Terms and Conditions"
+                android:textSize="12sp"
+                android:textColor="#444"
+                android:gravity="center"/>
         </LinearLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnGoogleSignIn"
-            android:textSize="16dp"
-            android:background="@drawable/rounded_except_top_right"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Sign in with NITC Email"
-            android:textColor="@color/white"
-            android:elevation="0dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="8dp"
-            android:paddingVertical="12dp"
-            android:paddingHorizontal="16dp"
-            app:icon="@drawable/ic_google_logo"
-            app:iconGravity="textStart"
-            app:iconPadding="12dp" />
-
-        <!-- Terms -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="By Logging in you agree to our Terms and Conditions"
-            android:textSize="12sp"
-            android:textColor="#444"
-            android:gravity="center"/>
-    </LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
