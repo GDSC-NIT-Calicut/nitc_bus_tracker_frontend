@@ -143,7 +143,7 @@
             android:background="@drawable/rounded_except_top_right"
             android:id="@+id/btnRegister"
             android:layout_width="match_parent"
-            android:layout_height="70dp"
+            android:layout_height="wrap_content"
             android:text="Register"
             app:cornerRadius="20dp"
             android:textSize="30sp"
