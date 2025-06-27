@@ -20,6 +20,7 @@ import com.google.android.material.checkbox.MaterialCheckBox
 import kotlinx.coroutines.*
 import java.io.IOException
 import androidx.core.content.edit
+import androidx.core.view.WindowCompat
 import com.gdsc.nitcbustracker.data.model.LoginRequest
 import com.gdsc.nitcbustracker.data.network.RetrofitClient
 import com.google.android.material.button.MaterialButton
@@ -67,6 +68,8 @@ class LoginActivity : AppCompatActivity() {
         val savedUsername = sharedPreferences.getString("email", null)
         val savedPassword = sharedPreferences.getString("password", null)
 
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = false
+        
         if (savedUsername != null && savedPassword != null) {
             // Autofill the fields
             etUsername.setText(savedUsername)
