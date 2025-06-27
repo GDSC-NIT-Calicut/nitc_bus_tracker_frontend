@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -33,6 +34,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var btnLogin: MaterialButton
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var rememberMeCheckbox: MaterialCheckBox
+    private lateinit var progressBar: ProgressBar
 
     private lateinit var sharedPreferences: SharedPreferences
     private val PREFS_NAME = "LoginPrefs"
@@ -61,6 +63,7 @@ class LoginActivity : AppCompatActivity() {
         val btnGoogleSignIn = findViewById<MaterialButton>(R.id.btnGoogleSignIn)
 
         rememberMeCheckbox = findViewById(R.id.cbRememberMe)
+        progressBar = findViewById(R.id.progressBar)
 
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
 
@@ -90,6 +93,7 @@ class LoginActivity : AppCompatActivity() {
 
         val account = GoogleSignIn.getLastSignedInAccount(this)
         if (account != null) {
+            showProgress(true)
             val email = account.email
             val name = account.displayName
 
@@ -106,6 +110,7 @@ class LoginActivity : AppCompatActivity() {
                                 val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
                                 intent.putExtra("prefill_name", name)
                                 intent.putExtra("prefill_email", email)
+                                showProgress(false)
                                 startActivity(intent)
                                 finish()
                             } else {
@@ -116,13 +121,16 @@ class LoginActivity : AppCompatActivity() {
                                     "Welcome back, $name",
                                     Toast.LENGTH_SHORT
                                 ).show()
+                                showProgress(false)
                                 startActivity(intent)
                                 finish()
                             }
                         } else {
+                            showProgress(false)
                             Toast.makeText(this@LoginActivity, "Failed to fetch user info", Toast.LENGTH_SHORT).show()
                         }
                     } catch (e: Exception) {
+                        showProgress(false)
                         Toast.makeText(this@LoginActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -191,11 +199,13 @@ class LoginActivity : AppCompatActivity() {
 
     private fun loginUser(email: String, password: String) {
         lifecycleScope.launch {
+            showProgress(true)
             val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
             try {
                 val response = withContext(Dispatchers.IO) {
                     RetrofitClient.api.login(LoginRequest(email, password))
                 }
+                showProgress(false)
                 if (response.isSuccessful) {
                     val loginResponse = response.body()
                     if (loginResponse?.success == true) {
@@ -249,8 +259,10 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(this@LoginActivity, "Login failed", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: IOException) {
+                showProgress(false)
                 Toast.makeText(this@LoginActivity, "Network error: ${e.message}", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
+                showProgress(false)
                 Toast.makeText(this@LoginActivity, "Unexpected error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
@@ -262,6 +274,7 @@ class LoginActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == RC_SIGN_IN) {
+            showProgress(true)
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
@@ -275,6 +288,7 @@ class LoginActivity : AppCompatActivity() {
                             val response = withContext(Dispatchers.IO) {
                                 RetrofitClient.api.checkUserExists(email)
                             }
+                            showProgress(false)
 
                             if (response.isSuccessful) {
                                 val exists = response.body()?.get("exists") == true
@@ -302,12 +316,14 @@ class LoginActivity : AppCompatActivity() {
                                         Toast.makeText(this@LoginActivity, "Error registering: ${e.message}", Toast.LENGTH_SHORT).show()
                                     }
                                 } else {
+                                    showProgress(false)
                                     Toast.makeText(this@LoginActivity, "Only NITC emails are allowed", Toast.LENGTH_SHORT).show()
                                 }
                             }
 
 
                         } catch (e: Exception) {
+                            showProgress(false)
                             Toast.makeText(this@LoginActivity, "Server error: ${e.message}", Toast.LENGTH_SHORT).show()
                         }
                     }
@@ -330,6 +346,10 @@ class LoginActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun requestPermissions() {
         ActivityCompat.requestPermissions(this, requiredPermissions, PERMISSION_REQUEST_CODE)
+    }
+
+    private fun showProgress(show: Boolean) {
+        progressBar.visibility = if (show) View.VISIBLE else View.GONE
     }
 
 }

@@ -163,9 +163,7 @@
                 app:iconGravity="textStart"
                 app:iconTint="@color/black"
                 app:iconPadding="12dp" />
-
-
-
+            
             <!-- Terms -->
             <TextView
                 android:layout_width="wrap_content"
@@ -176,4 +174,17 @@
                 android:gravity="center"/>
         </LinearLayout>
     </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:visibility="invisible"
+        android:indeterminateTint="@color/black"
+        android:indeterminate="true" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
