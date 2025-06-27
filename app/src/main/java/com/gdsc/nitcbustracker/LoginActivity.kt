@@ -90,12 +90,45 @@ class LoginActivity : AppCompatActivity() {
 
         val account = GoogleSignIn.getLastSignedInAccount(this)
         if (account != null) {
-            // User is already signed in
-            val intent = Intent(this, StudentActivity::class.java)
-            Toast.makeText(this@LoginActivity, "Welcome back, ${account.displayName}", Toast.LENGTH_SHORT).show()
-            startActivity(intent)
-            finish()
+            val email = account.email
+            val name = account.displayName
+
+            if (email != null) {
+                lifecycleScope.launch {
+                    try {
+                        val userInfoResponse = withContext(Dispatchers.IO) {
+                            RetrofitClient.api.getUserInfo(email)
+                        }
+                        if (userInfoResponse.isSuccessful) {
+                            val userInfo = userInfoResponse.body()
+                            if (userInfo?.needsMoreInfo == true) {
+                                // Registration incomplete: force to RegisterActivity
+                                val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
+                                intent.putExtra("prefill_name", name)
+                                intent.putExtra("prefill_email", email)
+                                startActivity(intent)
+                                finish()
+                            } else {
+                                // Registration complete: proceed to StudentActivity
+                                val intent = Intent(this@LoginActivity, StudentActivity::class.java)
+                                Toast.makeText(
+                                    this@LoginActivity,
+                                    "Welcome back, $name",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                startActivity(intent)
+                                finish()
+                            }
+                        } else {
+                            Toast.makeText(this@LoginActivity, "Failed to fetch user info", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(this@LoginActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
+
 
         val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
         val isLoggedIn = prefs.getBoolean("logged_in", false)

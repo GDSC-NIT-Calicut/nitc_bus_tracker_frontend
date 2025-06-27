@@ -5,4 +5,5 @@ data class UserInfo(
     val email: String,
     val phone: String,
     val hostel: String,
+    val needsMoreInfo: Boolean
 )
