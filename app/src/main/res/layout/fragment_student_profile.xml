@@ -49,6 +49,7 @@
             android:layout_marginBottom="4dp" />
 
         <EditText
+            android:hint="Default Name"
             android:textColor="@color/black"
             android:id="@+id/profile_student_name"
             android:layout_width="match_parent"
@@ -70,7 +71,7 @@
             android:id="@+id/profile_student_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="sahil_b230535cs@nitc.ac.in"
+            android:hint="default@gmail.com"
             android:enabled="false"
             android:layout_marginBottom="16dp" />
 
@@ -88,7 +89,7 @@
             android:id="@+id/profile_student_phone_no"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="6377417901"
+            android:hint="1234567890"
             android:enabled="false"
             android:layout_marginBottom="16dp" />
 
@@ -107,7 +108,7 @@
             android:id="@+id/profile_student_hostel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="MBH2"
+            android:hint="Default Hostel"
             android:enabled="false"
             android:layout_marginBottom="24dp" />
 

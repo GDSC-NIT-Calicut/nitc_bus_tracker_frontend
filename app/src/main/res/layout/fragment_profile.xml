@@ -53,6 +53,7 @@
             android:id="@+id/profile_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="Default Name"
             android:enabled="false"
             android:layout_marginBottom="16dp" />
 
@@ -70,7 +71,7 @@
             android:id="@+id/profile_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="sahil_b230535cs@nitc.ac.in"
+            android:hint="Default Email"
             android:enabled="false"
             android:layout_marginBottom="16dp" />
 
@@ -89,7 +90,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:enabled="false"
-            android:hint="6377417901"
+            android:hint="1234567890"
             android:textColor="@color/black" />
 
         <!-- Hostel -->
