@@ -194,6 +194,13 @@ class LoginActivity : AppCompatActivity() {
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
+                            "default" -> {
+                                prefs.edit { putString("role", "default") }
+                                val intent = Intent(this@LoginActivity, StudentActivity::class.java)
+                                startActivity(intent)
+                                finish()
+
+                            }
                             else -> {
                                 Toast.makeText(
                                     this@LoginActivity,
