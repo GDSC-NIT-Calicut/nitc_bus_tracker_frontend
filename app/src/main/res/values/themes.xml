@@ -4,4 +4,9 @@
     <item name="android:statusBarColor">@color/white</item>
     <item name="android:windowLightStatusBar">true</item>
     </style>
+
+    <style name="RoundedImage" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">60dp</item> <!-- half of width/height for a circle -->
+    </style>
 </resources>
