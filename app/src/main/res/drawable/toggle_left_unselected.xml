@@ -1,0 +1,7 @@
+<!-- res/drawable/toggle_left_unselected.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#FFFFFF" />
+    <corners android:topLeftRadius="25dp" android:bottomLeftRadius="25dp" />
+    <stroke android:color="@color/black"
+        android:width="2dp"/>
+</shape>

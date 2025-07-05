@@ -1,0 +1,5 @@
+<!-- res/drawable/toggle_right_selected.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#000000" />
+    <corners android:topRightRadius="0dp" android:bottomRightRadius="25dp" />
+</shape>
