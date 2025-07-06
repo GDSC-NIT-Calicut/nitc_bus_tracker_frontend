@@ -52,7 +52,7 @@ class NoticeAdapter(
             val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
             inputFormat.timeZone = TimeZone.getTimeZone("UTC")
 
-            val outputFormat = SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("dd MMM, hh:mm a", Locale.getDefault())
             outputFormat.timeZone = TimeZone.getTimeZone("Asia/Kolkata")
 
             val parsedDate = inputFormat.parse(notice.timestamp)

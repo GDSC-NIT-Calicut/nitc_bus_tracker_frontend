@@ -1,7 +1,9 @@
 package com.gdsc.nitcbustracker
 
+import android.content.Context.MODE_PRIVATE
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.gdsc.nitcbustracker.data.model.Notice
 import com.gdsc.nitcbustracker.data.network.RetrofitClient
+import com.gdsc.nitcbustracker.data.network.RetrofitClient.api
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -20,17 +23,16 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
-import kotlin.time.Duration
 
 class NewNoticeFragment : Fragment() {
 
-    private lateinit var noticeName: EditText
     private lateinit var noticeTopic: EditText
     private lateinit var toWhomSpinner: Spinner
     private lateinit var messageEditText: EditText
     private lateinit var sendButton: Button
     private lateinit var pushNotificationCheckBox: CheckBox
     private lateinit var spinnerDuration: Spinner
+    lateinit var adminName: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,7 +48,6 @@ class NewNoticeFragment : Fragment() {
         (requireActivity() as? AdminActivity)?.hideBottomNav()
 
         // Initialize views
-        noticeName = view.findViewById(R.id.noticeName)
         noticeTopic = view.findViewById(R.id.noticeTopic)
         toWhomSpinner = view.findViewById(R.id.spinnerToWhom)
         messageEditText = view.findViewById(R.id.editTextMessage)
@@ -60,9 +61,26 @@ class NewNoticeFragment : Fragment() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerDuration.adapter = adapter
 
+        val sharedPref = requireActivity().getSharedPreferences("app_prefs", MODE_PRIVATE)
+        val email = sharedPref.getString("admin_email", null)
+
+        // Fetch admin profile from backend
+        lifecycleScope.launch {
+            try {
+                val response = api.getUserInfo(email.toString())
+                if (response.isSuccessful) {
+                    val adminInfo = response.body()
+                    adminName = adminInfo?.name.toString()
+                    // Optional: Load image from URL if adminInfo?.photo exists
+                }
+            } catch (e: Exception) {
+                Log.d("GetUserInfo", "Error $e")
+            }
+        }
+
         sendButton.setOnClickListener {
             val topic = noticeTopic.text.toString().trim()
-            val name = noticeName.text.toString().trim()
+            val name = adminName
             val toWhom = toWhomSpinner.selectedItem.toString()
             val message = messageEditText.text.toString().trim()
 
@@ -70,7 +88,7 @@ class NewNoticeFragment : Fragment() {
             isoFormat.timeZone = TimeZone.getTimeZone("UTC")
             val timestamp = isoFormat.format(Date())
 
-            if (name.isEmpty() || message.isEmpty()) {
+            if (name?.isEmpty() == true || message.isEmpty()) {
                 Toast.makeText(requireActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -85,7 +103,7 @@ class NewNoticeFragment : Fragment() {
                 else -> null
             }
 
-            val request = Notice(name, topic, toWhom, message, timestamp, validTill)
+            val request = Notice(name.toString(), topic, toWhom, message, timestamp, validTill)
 
             // Push Notification
             if (pushNotificationCheckBox.isChecked) {
