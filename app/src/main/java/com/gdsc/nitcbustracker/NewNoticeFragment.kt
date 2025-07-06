@@ -55,11 +55,15 @@ class NewNoticeFragment : Fragment() {
         pushNotificationCheckBox = view.findViewById(R.id.checkboxNotifs)
         spinnerDuration = view.findViewById(R.id.spinnerDuration)
         val durations = resources.getStringArray(R.array.duration_options)
+        val toWhom = resources.getStringArray(R.array.to_whom_options)
 
         // Create ArrayAdapter
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, durations)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerDuration.adapter = adapter
+        val adapterDurations = ArrayAdapter(requireContext(), R.layout.spinner_item_icon, durations)
+        val adapterToWhom = ArrayAdapter(requireContext(), R.layout.spinner_item_icon, toWhom)
+        adapterDurations.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        adapterToWhom.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerDuration.adapter = adapterDurations
+        toWhomSpinner.adapter = adapterToWhom
 
         val sharedPref = requireActivity().getSharedPreferences("app_prefs", MODE_PRIVATE)
         val email = sharedPref.getString("admin_email", null)
