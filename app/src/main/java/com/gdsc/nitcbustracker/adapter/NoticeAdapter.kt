@@ -36,7 +36,7 @@ class NoticeAdapter(
         val notice = notices[position]
         holder.noticeTitle.text = notice.topic
         holder.messageText.text = notice.message
-        holder.byWhom.text = "By: ${notice.name}"
+        holder.byWhom.text = notice.name
 
         if (role == "admin") {
             holder.button.visibility = View.VISIBLE

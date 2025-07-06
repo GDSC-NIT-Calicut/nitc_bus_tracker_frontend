@@ -13,4 +13,12 @@
         <item>Both</item>
     </string-array>
 
+    <string-array name="duration_options">
+        <item>Permanent</item>
+        <item>6 hours</item>
+        <item>12 hours</item>
+        <item>1 day</item>
+        <item>7 days</item>
+    </string-array>
+
 </resources>

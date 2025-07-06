@@ -16,9 +16,11 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import kotlin.time.Duration
 
 class NewNoticeFragment : Fragment() {
 
@@ -28,6 +30,7 @@ class NewNoticeFragment : Fragment() {
     private lateinit var messageEditText: EditText
     private lateinit var sendButton: Button
     private lateinit var pushNotificationCheckBox: CheckBox
+    private lateinit var spinnerDuration: Spinner
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,6 +52,13 @@ class NewNoticeFragment : Fragment() {
         messageEditText = view.findViewById(R.id.editTextMessage)
         sendButton = view.findViewById(R.id.buttonSend)
         pushNotificationCheckBox = view.findViewById(R.id.checkboxNotifs)
+        spinnerDuration = view.findViewById(R.id.spinnerDuration)
+        val durations = resources.getStringArray(R.array.duration_options)
+
+        // Create ArrayAdapter
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, durations)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerDuration.adapter = adapter
 
         sendButton.setOnClickListener {
             val topic = noticeTopic.text.toString().trim()
@@ -65,7 +75,17 @@ class NewNoticeFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            val request = Notice(name, topic, toWhom, message, timestamp)
+            val selectedDuration = spinnerDuration.selectedItem.toString()
+            val validTill: String? = when (selectedDuration) {
+                "Permanent" -> null
+                "6 hours" -> calculateFutureISO(60 * 6)
+                "12 hours" -> calculateFutureISO(60 * 12)
+                "1 day" -> calculateFutureISO(60 * 24)
+                "7 days" -> calculateFutureISO(60 * 24 * 7)
+                else -> null
+            }
+
+            val request = Notice(name, topic, toWhom, message, timestamp, validTill)
 
             // Push Notification
             if (pushNotificationCheckBox.isChecked) {
@@ -108,6 +128,15 @@ class NewNoticeFragment : Fragment() {
             Toast.makeText(requireActivity(), "Notice Sent:\nTo: $toWhom", Toast.LENGTH_LONG).show()
         }
     }
+
+    fun calculateFutureISO(minutesFromNow: Int): String {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.MINUTE, minutesFromNow)
+        val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        isoFormat.timeZone = TimeZone.getTimeZone("UTC")
+        return isoFormat.format(calendar.time)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         // Show bottom navigation again when leaving the fragment

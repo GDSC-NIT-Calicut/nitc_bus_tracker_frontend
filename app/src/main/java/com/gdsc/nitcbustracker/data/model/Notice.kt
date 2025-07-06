@@ -5,5 +5,6 @@ data class Notice(
     val topic: String,
     val to_whom: String,
     val message: String,
-    val timestamp: String
+    val timestamp: String,
+    val validTill: String?
 )
