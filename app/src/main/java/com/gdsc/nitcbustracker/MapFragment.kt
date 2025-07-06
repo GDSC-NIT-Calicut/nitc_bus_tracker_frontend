@@ -1,5 +1,6 @@
 package com.gdsc.nitcbustracker
 
+import android.content.Context
 import com.gdsc.nitcbustracker.data.network.RetrofitClient
 import android.os.Bundle
 import android.util.Log
@@ -33,6 +34,7 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
+import androidx.core.content.edit
 
 class MapFragment : Fragment(), OnMapReadyCallback {
 
@@ -326,6 +328,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val current = stops.find { it.stop_id == currentRouteStop.stop_id }
         val next = stops.find { it.stop_id == nextRouteStop?.stop_id }
 
+        if (next != null) {
+            saveNextStop(location.bus_id, next.name, requireContext())
+        }
+
         return StopPair(current, next)
     }
 
@@ -408,4 +414,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         super.onDestroyView()
         updateJob?.cancel()
     }
+
+    fun saveNextStop(busId: String, nextStop: String, context: Context) {
+        val prefs = context.getSharedPreferences("next_stops_prefs", Context.MODE_PRIVATE)
+        prefs.edit().putString(busId, nextStop).apply()
+    }
 }
+

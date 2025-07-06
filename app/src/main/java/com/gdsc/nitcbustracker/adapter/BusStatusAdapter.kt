@@ -1,5 +1,6 @@
 package com.gdsc.nitcbustracker.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ class BusStatusAdapter(private val buses: List<BusStatus>) :
     inner class BusViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val busId: TextView = itemView.findViewById(R.id.busTitle)
         val currentStop: TextView = itemView.findViewById(R.id.currentStopText)
+        val nextStop: TextView = itemView.findViewById(R.id.nextStopText)
         val eta: TextView = itemView.findViewById(R.id.etaText)
     }
 
@@ -25,10 +27,16 @@ class BusStatusAdapter(private val buses: List<BusStatus>) :
 
     override fun onBindViewHolder(holder: BusViewHolder, position: Int) {
         val bus = buses[position]
-        holder.busId.text = "Bus ID: ${bus.bus_id}"
-        holder.currentStop.text = bus.current_stop_name
-        holder.eta.text = bus.eta.toString()
+        holder.busId.text = "${bus.bus_id}"
+        holder.currentStop.text = "${bus.current_stop_name}"
+        holder.nextStop.text = "${getNextStop(bus.bus_id, holder.itemView.context)}"
+        holder.eta.text = "${bus.eta} mins"
     }
 
     override fun getItemCount() = buses.size
+
+    private fun getNextStop(busId: String, context: Context): String {
+        val prefs = context.getSharedPreferences("next_stops_prefs", Context.MODE_PRIVATE)
+        return prefs.getString(busId, "Unknown") ?: "Unknown"
+    }
 }
