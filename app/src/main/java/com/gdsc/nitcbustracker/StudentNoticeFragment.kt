@@ -1,5 +1,6 @@
 package com.gdsc.nitcbustracker
 
+import android.content.Context.MODE_PRIVATE
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -35,8 +36,14 @@ class StudentNoticeFragment : Fragment() {
         recyclerView = view.findViewById(R.id.noticeRecyclerView)
         emptyNotice = view.findViewById(R.id.noticeEmpty)
 
+        val sharedPref = requireActivity().getSharedPreferences("app_prefs", MODE_PRIVATE)
+        val role = sharedPref.getString("role", null)
+
         // Setup adapter with empty list initially
-        noticeAdapter = NoticeAdapter(mutableListOf())
+        noticeAdapter = NoticeAdapter(emptyList(), role.toString()) { notice ->
+            // Students don't delete notices, but we must pass something
+            Log.d("StudentNoticeFragment", "Delete clicked on ${notice.topic}, but ignored.")
+        }
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = noticeAdapter
 

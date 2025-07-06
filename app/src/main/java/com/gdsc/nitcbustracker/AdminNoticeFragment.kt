@@ -1,5 +1,6 @@
 package com.gdsc.nitcbustracker
 
+import android.content.Context.MODE_PRIVATE
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -19,7 +20,6 @@ import kotlinx.coroutines.launch
 
 class AdminNoticeFragment : Fragment() {
     private lateinit var addNotice: ImageView
-
     private lateinit var recyclerView: RecyclerView
     private lateinit var noticeAdapter: NoticeAdapter
     private lateinit var emptyNotice: TextView
@@ -28,7 +28,6 @@ class AdminNoticeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_admin_notice, container, false)
     }
 
@@ -37,41 +36,73 @@ class AdminNoticeFragment : Fragment() {
 
         recyclerView = view.findViewById(R.id.noticeRecyclerView)
         addNotice = view.findViewById(R.id.addNoticeButton)
+        emptyNotice = view.findViewById(R.id.noticeEmpty)
+
+        val sharedPref = requireActivity().getSharedPreferences("app_prefs", MODE_PRIVATE)
+        val role = sharedPref.getString("role", null) ?: ""
+
+        noticeAdapter = NoticeAdapter(emptyList(), role) { noticeToDelete ->
+
+            // Show confirmation dialog
+            val context = requireContext()
+            androidx.appcompat.app.AlertDialog.Builder(context)
+                .setTitle("Delete Notice")
+                .setMessage("Are you sure you want to delete the notice titled \"${noticeToDelete.topic}\"?")
+                .setPositiveButton("Delete") { dialog, _ ->
+                    dialog.dismiss()
+                    lifecycleScope.launch {
+                        try {
+                            val response = RetrofitClient.api.deleteNotice(noticeToDelete.topic)
+                            if (response.isSuccessful) {
+                                val updatedList = noticeAdapter.getNotices()
+                                    .filter { it.topic != noticeToDelete.topic }
+                                noticeAdapter.updateNotices(updatedList)
+                            } else {
+                                Log.e("AdminNoticeFragment", "Failed to delete: ${response.code()}")
+                            }
+                        } catch (e: Exception) {
+                            Log.e("AdminNoticeFragment", "Exception during delete", e)
+                        }
+                    }
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss() // just close dialog
+                }
+                .show()
+        }
 
 
-
-        // Setup adapter with empty list initially
-        noticeAdapter = NoticeAdapter(mutableListOf())
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = noticeAdapter
 
-        emptyNotice = view.findViewById(R.id.noticeEmpty)
-
         lifecycleScope.launch {
             while (isActive) {
-                try {
-                    val response = RetrofitClient.api.getNotices()
-                    val notices = response.body()?.takeLast(10)?.reversed() // Take last 10 records
-                    Log.d("GetNoticeFragment", "Fetched notices: $notices")
-
-                    if (!notices.isNullOrEmpty()) {
-                        emptyNotice.text = ""
-                        noticeAdapter.updateNotices(notices)
-                    }
-                } catch (e: Exception) {
-                    Log.e("GetNoticeFragment", "Failed to fetch notices", e)
-                }
-
-                delay(10000L) // Refresh every 10 seconds
+                fetchNotices()
+                delay(10000L) // refresh every 10s
             }
         }
-
 
         addNotice.setOnClickListener {
             val transaction = parentFragmentManager.beginTransaction()
             transaction.replace(R.id.nav_admin_fragment, NewNoticeFragment())
             transaction.addToBackStack(null)
             transaction.commit()
+        }
+    }
+
+    private suspend fun fetchNotices() {
+        try {
+            val response = RetrofitClient.api.getNotices()
+            val notices = response.body()?.takeLast(10)?.reversed()
+            if (!notices.isNullOrEmpty()) {
+                emptyNotice.text = ""
+                noticeAdapter.updateNotices(notices)
+            } else {
+                emptyNotice.text = "No notices available."
+                noticeAdapter.updateNotices(emptyList())
+            }
+        } catch (e: Exception) {
+            Log.e("AdminNoticeFragment", "Failed to fetch notices", e)
         }
     }
 }

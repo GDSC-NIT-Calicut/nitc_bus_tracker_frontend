@@ -15,6 +15,7 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -35,6 +36,9 @@ interface ApiService {
 
     @POST("/api/location/post")
     fun sendLocation(@Body busLocation: BusLocation): Call<ResponseBody>
+
+    @DELETE("/api/notices/delete/{topic}")
+    suspend fun deleteNotice(@Path("topic") topic: String): Response<GenericResponse>
 
     @GET("/api/notices/get")
     suspend fun getNotices(): Response<List<Notice>>
