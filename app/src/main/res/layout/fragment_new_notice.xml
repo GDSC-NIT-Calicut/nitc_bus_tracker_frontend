@@ -48,7 +48,7 @@
             android:paddingHorizontal="16dp"
             android:entries="@array/to_whom_options"
             android:layout_marginBottom="24dp"
-            android:popupBackground="#FFFFFF" />
+            android:popupBackground="@drawable/rounded_card" />
 
         <!-- Name of Person -->
         <TextView
