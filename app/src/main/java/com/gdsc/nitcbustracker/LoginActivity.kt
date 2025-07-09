@@ -131,7 +131,7 @@ class LoginActivity : AppCompatActivity() {
                         }
                     } catch (e: Exception) {
                         showProgress(false)
-                        Toast.makeText(this@LoginActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@LoginActivity, "Network Error", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -260,10 +260,10 @@ class LoginActivity : AppCompatActivity() {
                 }
             } catch (e: IOException) {
                 showProgress(false)
-                Toast.makeText(this@LoginActivity, "Network error: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@LoginActivity, "Network error", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
                 showProgress(false)
-                Toast.makeText(this@LoginActivity, "Unexpected error: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@LoginActivity, "Unexpected error", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -324,7 +324,7 @@ class LoginActivity : AppCompatActivity() {
 
                         } catch (e: Exception) {
                             showProgress(false)
-                            Toast.makeText(this@LoginActivity, "Server error: ${e.message}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@LoginActivity, "Server error", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
