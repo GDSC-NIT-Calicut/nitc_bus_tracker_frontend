@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -60,6 +61,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var stopText: TextView? = null
     private var nextStopText: TextView? = null
     private var etaText: TextView? = null
+    private lateinit var progressBar: ProgressBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -71,6 +73,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         stopText = view.findViewById(R.id.current_stop_text)
         nextStopText = view.findViewById(R.id.next_stop_text)
         etaText = view.findViewById(R.id.eta_text_view)
+        progressBar = view.findViewById(R.id.progressBar)
 
         mapFragment = childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
         if (mapFragment == null) {
@@ -110,6 +113,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun startRepeatingUpdates() {
         updateJob = viewLifecycleOwner.lifecycleScope.launch {
+            showProgress(true)
             try {
                 stops = RetrofitClient.api.getStops()
             } catch (e: Exception) {
@@ -146,16 +150,38 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
                             launch {
                                 val routeStops = getRouteStopsForBus(bus)
-                                val (currentStop, nextStop) = findCurrentAndNextStop(location, routeStops)
+                                val (currentStop, nextStop) = findCurrentAndNextStop(
+                                    location,
+                                    routeStops
+                                )
 
-                                Log.d("BusDebug", "Bus ${bus.bus_id} Current Stop: ${currentStop?.name ?: "Unknown"}")
-                                Log.d("BusDebug", "Bus ${bus.bus_id} Next Stop: ${nextStop?.name ?: "Unknown"}")
+                                Log.d(
+                                    "BusDebug",
+                                    "Bus ${bus.bus_id} Current Stop: ${currentStop?.name ?: "Unknown"}"
+                                )
+                                Log.d(
+                                    "BusDebug",
+                                    "Bus ${bus.bus_id} Next Stop: ${nextStop?.name ?: "Unknown"}"
+                                )
 
-                                val speed = calculateSpeed(location.bus_id, location.latitude, location.longitude)
-                                val eta = calculateEtaWithSpeed(location.latitude, location.longitude, nextStop, speed)
+                                val speed = calculateSpeed(
+                                    location.bus_id,
+                                    location.latitude,
+                                    location.longitude
+                                )
+                                val eta = calculateEtaWithSpeed(
+                                    location.latitude,
+                                    location.longitude,
+                                    nextStop,
+                                    speed
+                                )
 
 
-                                val isMoving = hasLocationChanged(location.bus_id, location.latitude, location.longitude)
+                                val isMoving = hasLocationChanged(
+                                    location.bus_id,
+                                    location.latitude,
+                                    location.longitude
+                                )
                                 val statusText = if (isMoving) "Running" else "Not Running"
 
                                 val busStatus = BusStatus(
@@ -171,7 +197,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                                     if (response.isSuccessful) {
                                         Log.d("BusDebug", "Posted BusStatus: $busStatus")
                                     } else {
-                                        Log.e("BusDebug", "Failed to post BusStatus: ${response.errorBody()?.string()}")
+                                        Log.e(
+                                            "BusDebug",
+                                            "Failed to post BusStatus: ${
+                                                response.errorBody()?.string()
+                                            }"
+                                        )
                                     }
                                 } catch (e: Exception) {
                                     Log.e("BusDebug", "Error posting BusStatus", e)
@@ -182,6 +213,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 } catch (e: Exception) {
                     Log.e("MapFragment", "Failed to fetch bus locations", e)
                 }
+                showProgress(false)
                 delay(updateInterval)
             }
         }
@@ -417,7 +449,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     fun saveNextStop(busId: String, nextStop: String, context: Context) {
         val prefs = context.getSharedPreferences("next_stops_prefs", Context.MODE_PRIVATE)
-        prefs.edit().putString(busId, nextStop).apply()
+        prefs.edit { putString(busId, nextStop) }
+    }
+
+    private fun showProgress(show: Boolean) {
+        progressBar.visibility = if (show) View.VISIBLE else View.GONE
     }
 }
 

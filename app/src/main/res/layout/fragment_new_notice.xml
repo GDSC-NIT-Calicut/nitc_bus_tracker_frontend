@@ -1,134 +1,152 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    android:padding="24dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_horizontal">
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:padding="24dp">
 
-        <!-- Back Arrow and Title -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="32dp"
-            android:weightSum="1">
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="New Notice"
-                android:textSize="40sp"
-                android:textStyle="bold"
-                android:textColor="#000000"
-                android:gravity="center"
-                android:layout_weight="1" />
-        </LinearLayout>
-
-        <!-- Send To -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Send to"
-            android:textSize="16sp"
-            android:textColor="#000000"
-            android:layout_marginBottom="8dp" />
-
-        <Spinner
-            android:id="@+id/spinnerToWhom"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:background="@drawable/rounded_border"
-            android:paddingHorizontal="9dp"
-            android:entries="@array/to_whom_options"
-            android:layout_marginBottom="24dp"
-            android:popupBackground="@drawable/rounded_card" />
-
-        <!-- Topic -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Topic"
-            android:textSize="16sp"
-            android:textColor="#000000"
-            android:layout_marginBottom="8dp" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:hint="Enter Topic"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/noticeTopic"
+            <!-- Back Arrow and Title -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#000000"
-                android:textColorHint="#888888" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="32dp"
+                android:weightSum="1">
 
-        <!-- Message -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Duration"
-            android:textSize="16sp"
-            android:textColor="#000000"
-            android:layout_marginBottom="8dp" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="New Notice"
+                    android:textSize="40sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"
+                    android:gravity="center"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <!-- Send To -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Send to"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:layout_marginBottom="8dp" />
 
             <Spinner
-                android:id="@+id/spinnerDuration"
-                android:popupBackground="@drawable/rounded_card"
+                android:id="@+id/spinnerToWhom"
                 android:layout_width="match_parent"
-                android:paddingHorizontal="9dp"
+                android:layout_height="56dp"
                 android:background="@drawable/rounded_border"
+                android:paddingHorizontal="9dp"
+                android:entries="@array/to_whom_options"
                 android:layout_marginBottom="24dp"
-                android:layout_height="56dp" />
+                android:popupBackground="@drawable/rounded_card" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:hint="Enter your message"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTextMessage"
+            <!-- Topic -->
+            <TextView
                 android:layout_width="match_parent"
-                android:layout_height="160dp"
-                android:gravity="top|start"
-                android:inputType="textMultiLine"
+                android:layout_height="wrap_content"
+                android:text="Topic"
+                android:textSize="16sp"
                 android:textColor="#000000"
-                android:textColorHint="#888888" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginBottom="8dp" />
 
-        <!-- Push Notifications Toggle -->
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/checkboxNotifs"
-            android:text="Push notifications"
-            android:textSize="16sp"
-            android:textColor="#000000"
-            android:layout_gravity="start"
-            android:layout_marginBottom="24dp" />
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:hint="Enter Topic"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-        <!-- Send Button -->
-        <Button
-            android:id="@+id/buttonSend"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="Send"
-            android:textSize="18sp"
-            android:textColor="#ffffff"
-            android:background="@drawable/rounded_except_top_right"
-            android:layout_marginTop="8dp" />
-    </LinearLayout>
-</ScrollView>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/noticeTopic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#000000"
+                    android:textColorHint="#888888" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Message -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Duration"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:layout_marginBottom="8dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerDuration"
+                    android:popupBackground="@drawable/rounded_card"
+                    android:layout_width="match_parent"
+                    android:paddingHorizontal="9dp"
+                    android:background="@drawable/rounded_border"
+                    android:layout_marginBottom="24dp"
+                    android:layout_height="56dp" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:hint="Enter your message"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="160dp"
+                    android:gravity="top|start"
+                    android:inputType="textMultiLine"
+                    android:textColor="#000000"
+                    android:textColorHint="#888888" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Push Notifications Toggle -->
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/checkboxNotifs"
+                android:text="Push notifications"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:layout_gravity="start"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Send Button -->
+            <Button
+                android:id="@+id/buttonSend"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="Send"
+                android:textSize="18sp"
+                android:textColor="#ffffff"
+                android:background="@drawable/rounded_except_top_right"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:visibility="invisible"
+        android:indeterminateTint="@color/black"
+        android:indeterminate="true" />
+</androidx.constraintlayout.widget.ConstraintLayout>

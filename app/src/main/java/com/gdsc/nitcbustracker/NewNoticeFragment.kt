@@ -1,6 +1,7 @@
 package com.gdsc.nitcbustracker
 
 import android.content.Context.MODE_PRIVATE
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -33,6 +34,7 @@ class NewNoticeFragment : Fragment() {
     private lateinit var pushNotificationCheckBox: CheckBox
     private lateinit var spinnerDuration: Spinner
     lateinit var adminName: String
+    private lateinit var progressBar: ProgressBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,6 +56,7 @@ class NewNoticeFragment : Fragment() {
         sendButton = view.findViewById(R.id.buttonSend)
         pushNotificationCheckBox = view.findViewById(R.id.checkboxNotifs)
         spinnerDuration = view.findViewById(R.id.spinnerDuration)
+        progressBar = view.findViewById(R.id.progressBar)
         val durations = resources.getStringArray(R.array.duration_options)
         val toWhom = resources.getStringArray(R.array.to_whom_options)
 
@@ -75,7 +78,6 @@ class NewNoticeFragment : Fragment() {
                 if (response.isSuccessful) {
                     val adminInfo = response.body()
                     adminName = adminInfo?.name.toString()
-                    // Optional: Load image from URL if adminInfo?.photo exists
                 }
             } catch (e: Exception) {
                 Log.d("GetUserInfo", "Error $e")
@@ -83,6 +85,7 @@ class NewNoticeFragment : Fragment() {
         }
 
         sendButton.setOnClickListener {
+            showProgress(true)
             val topic = noticeTopic.text.toString().trim()
             val name = adminName
             val toWhom = toWhomSpinner.selectedItem.toString()
@@ -92,7 +95,7 @@ class NewNoticeFragment : Fragment() {
             isoFormat.timeZone = TimeZone.getTimeZone("UTC")
             val timestamp = isoFormat.format(Date())
 
-            if (name?.isEmpty() == true || message.isEmpty()) {
+            if (name.isEmpty() == true || message.isEmpty()) {
                 Toast.makeText(requireActivity(), "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -125,10 +128,12 @@ class NewNoticeFragment : Fragment() {
                         } else {
                             Toast.makeText(requireActivity(), "Failed: ${response.code()}", Toast.LENGTH_SHORT).show()
                         }
+                        showProgress(false)
                     }
 
                     override fun onFailure(call: Call<Void>, t: Throwable) {
-                        Toast.makeText(requireActivity(), "Error: ${t.message}", Toast.LENGTH_LONG).show()
+                        Log.d("NewNotice", "Error: ${t.message}")
+                        showProgress(false)
                     }
                 })
             }
@@ -138,16 +143,19 @@ class NewNoticeFragment : Fragment() {
                 try {
                     val response = RetrofitClient.api.updateNotices(request)
                     if (response.isSuccessful && response.body()?.success == true) {
-                        Toast.makeText(requireActivity(), response.body()?.message ?: "Successfully Registered", Toast.LENGTH_SHORT).show()
+                        Log.d("Notice_Added", response.body()?.message ?: "Successfully Registered")
                     } else {
-                        Toast.makeText(requireActivity(), response.body()?.message ?: "Server Error", Toast.LENGTH_SHORT).show()
+                        Log.d("Notice_Added", response.body()?.message ?: "Server Error")
                     }
+                    showProgress(false)
                 } catch (e: Exception) {
                     Toast.makeText(requireActivity(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    showProgress(false)
                 }
+                requireActivity().supportFragmentManager.popBackStack()
             }
 
-            Toast.makeText(requireActivity(), "Notice Sent:\nTo: $toWhom", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireActivity(), "Successfully Notice Sent to: $toWhom", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -165,4 +173,7 @@ class NewNoticeFragment : Fragment() {
         (requireActivity() as? AdminActivity)?.showBottomNav()
     }
 
+    private fun showProgress(show: Boolean) {
+        progressBar.visibility = if (show) View.VISIBLE else View.GONE
+    }
 }

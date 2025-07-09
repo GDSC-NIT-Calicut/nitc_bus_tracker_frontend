@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,6 +24,7 @@ class AdminNoticeFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var noticeAdapter: NoticeAdapter
     private lateinit var emptyNotice: TextView
+    private lateinit var progressBar: ProgressBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,6 +39,7 @@ class AdminNoticeFragment : Fragment() {
         recyclerView = view.findViewById(R.id.noticeRecyclerView)
         addNotice = view.findViewById(R.id.addNoticeButton)
         emptyNotice = view.findViewById(R.id.noticeEmpty)
+        progressBar = view.findViewById(R.id.progressBar)
 
         val sharedPref = requireActivity().getSharedPreferences("app_prefs", MODE_PRIVATE)
         val role = sharedPref.getString("role", null) ?: ""
@@ -50,6 +53,7 @@ class AdminNoticeFragment : Fragment() {
                 .setMessage("Are you sure you want to delete the notice titled \"${noticeToDelete.topic}\"?")
                 .setPositiveButton("Delete") { dialog, _ ->
                     dialog.dismiss()
+                    showProgress(true)
                     lifecycleScope.launch {
                         try {
                             val response = RetrofitClient.api.deleteNotice(noticeToDelete.topic)
@@ -57,12 +61,14 @@ class AdminNoticeFragment : Fragment() {
                                 val updatedList = noticeAdapter.getNotices()
                                     .filter { it.topic != noticeToDelete.topic }
                                 noticeAdapter.updateNotices(updatedList)
+                                fetchNotices()
                             } else {
                                 Log.e("AdminNoticeFragment", "Failed to delete: ${response.code()}")
                             }
                         } catch (e: Exception) {
                             Log.e("AdminNoticeFragment", "Exception during delete", e)
                         }
+                        showProgress(false)
                     }
                 }
                 .setNegativeButton("Cancel") { dialog, _ ->
@@ -104,5 +110,9 @@ class AdminNoticeFragment : Fragment() {
         } catch (e: Exception) {
             Log.e("AdminNoticeFragment", "Failed to fetch notices", e)
         }
+    }
+
+    private fun showProgress(show: Boolean) {
+        progressBar.visibility = if (show) View.VISIBLE else View.GONE
     }
 }
