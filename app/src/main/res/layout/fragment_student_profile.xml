@@ -27,17 +27,36 @@
             android:textSize="40sp"
             android:textColor="#000000" />
 
-        <!-- Profile Image Placeholder -->
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/profile_student_image"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+        <FrameLayout
+            android:layout_width="wrap_content"
             android:layout_marginBottom="32dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="8dp"
-            android:contentDescription="TODO"
-            android:scaleType="centerCrop"
-            app:shapeAppearanceOverlay="@style/RoundedImage" />
+            android:layout_height="wrap_content">
+
+            <!-- Profile Image Placeholder -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/profile_student_image"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginBottom="8dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:contentDescription="TODO"
+                android:scaleType="centerCrop"
+                android:src="@drawable/empty_profile_pic"
+                app:shapeAppearanceOverlay="@style/RoundedImage" />
+
+            <ImageView
+                android:clickable="true"
+                android:id="@+id/edit_icon"
+                android:contentDescription="edit_icon"
+                android:focusable="true"
+                android:padding="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:foregroundGravity="bottom"
+                android:src="@drawable/ic_edit_icon" />
+        </FrameLayout>
 
         <!-- Name -->
         <TextView
@@ -49,6 +68,7 @@
             android:layout_marginBottom="4dp" />
 
         <EditText
+            android:singleLine="true"
             android:hint="Default Name"
             android:textColor="@color/black"
             android:id="@+id/profile_student_name"
@@ -67,6 +87,7 @@
             android:layout_marginBottom="4dp" />
 
         <EditText
+            android:singleLine="true"
             android:textColor="@color/black"
             android:id="@+id/profile_student_email"
             android:layout_width="match_parent"
@@ -85,6 +106,7 @@
             android:layout_marginBottom="4dp" />
 
         <EditText
+            android:singleLine="true"
             android:textColor="@color/black"
             android:id="@+id/profile_student_phone_no"
             android:layout_width="match_parent"
@@ -103,6 +125,7 @@
             android:layout_marginBottom="4dp" />
 
         <EditText
+            android:singleLine="true"
             style="@style/ThemeOverlay.Material3.TextInputEditText"
             android:textColor="@color/black"
             android:id="@+id/profile_student_hostel"
@@ -112,13 +135,29 @@
             android:enabled="false"
             android:layout_marginBottom="24dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/logout_student_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Log Out"
-            android:layout_marginBottom="24dp"
-            android:layout_gravity="center" />
+        <FrameLayout
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/logout_student_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Log Out"
+                android:layout_gravity="center" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/save_student_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Save"
+                android:visibility="invisible" />
+
+        </FrameLayout>
+
+
 
     </LinearLayout>
 </ScrollView>

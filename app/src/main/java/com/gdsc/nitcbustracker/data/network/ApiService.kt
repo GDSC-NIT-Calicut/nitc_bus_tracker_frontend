@@ -3,6 +3,7 @@ package com.gdsc.nitcbustracker.data.network
 import com.gdsc.nitcbustracker.data.model.Bus
 import com.gdsc.nitcbustracker.data.model.BusLocation
 import com.gdsc.nitcbustracker.data.model.BusStatus
+import com.gdsc.nitcbustracker.data.model.EditRequest
 import com.gdsc.nitcbustracker.data.model.GenericResponse
 import com.gdsc.nitcbustracker.data.model.LoginRequest
 import com.gdsc.nitcbustracker.data.model.LoginResponse
@@ -63,6 +64,9 @@ interface ApiService {
 
     @POST("/api/user/complete-registration")
     suspend fun completeRegistration(@Body request: RegisterRequest): Response<GenericResponse>
+
+    @POST("/api/user/edit-profile")
+    suspend fun editProfile(@Body editRequest: EditRequest): Response<GenericResponse>
 
     @GET("/api/user/exists")
     suspend fun checkUserExists(@Query("email") email: String): Response<Map<String, Boolean>>

@@ -12,8 +12,14 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.transition.Visibility
+import com.gdsc.nitcbustracker.RegisterActivity
+import com.gdsc.nitcbustracker.data.model.EditRequest
+import com.gdsc.nitcbustracker.data.model.RegisterRequest
+import com.gdsc.nitcbustracker.data.network.RetrofitClient
 import com.gdsc.nitcbustracker.data.network.RetrofitClient.api
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -47,6 +53,13 @@ class StudentProfileFragment : Fragment() {
         val account: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(requireContext())
         val email = account?.email
         val photo_url = account?.photoUrl
+        val editIcon = view.findViewById<ImageView>(R.id.edit_icon)
+        val saveButton = view.findViewById<Button>(R.id.save_student_button)
+
+        profileName.isEnabled = false
+        profileHostel.isEnabled = false
+        profilePhoneNo.isEnabled = false
+        profileEmail.isEnabled = false
 
         // Initialize GoogleSignInClient
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -79,6 +92,47 @@ class StudentProfileFragment : Fragment() {
 
         }
 
+        editIcon.setOnClickListener {
+            Toast.makeText(requireContext(), "Switched to Editing Mode!", Toast.LENGTH_SHORT).show()
+            profileName.isEnabled = true
+            profileHostel.isEnabled = true
+            profilePhoneNo.isEnabled = true
+            logoutButtonStudent.visibility = View.GONE
+            saveButton.visibility = View.VISIBLE
+        }
+
+        saveButton.setOnClickListener {
+            val name = profileName.text.toString().trim()
+            val hostel = profileHostel.text.toString().trim()
+            val phone = profilePhoneNo.text.toString().trim()
+            val email = profileEmail.text.toString().trim()
+
+            if (name.isEmpty() || hostel.isEmpty() || phone.isEmpty()) {
+                Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val request = EditRequest(name, email, hostel, phone)
+
+            lifecycleScope.launch {
+                try {
+                    val response = RetrofitClient.api.editProfile(request)
+                    if (response.isSuccessful && response.body()?.success == true) {
+                        Toast.makeText(requireContext(), response.body()?.message ?: "Profile Edit Successful", Toast.LENGTH_SHORT).show()
+                        profileName.isEnabled = false
+                        profileHostel.isEnabled = false
+                        profilePhoneNo.isEnabled = false
+                        logoutButtonStudent.visibility = View.VISIBLE
+                        saveButton.visibility = View.GONE
+
+                    } else {
+                        Toast.makeText(requireContext(), response.body()?.message ?: "Server Error", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
 
         // Load profile photo manually
         if (photo_url != null) {
