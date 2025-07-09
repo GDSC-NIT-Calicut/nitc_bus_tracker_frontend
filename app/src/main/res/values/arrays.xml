@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="bus_list">
-        <item>LH BUS 2</item>
-        <item>LH BUS 1</item>
-        <item>MBH BUS 2</item>
+        <item>MLH</item>
         <item>MBH BUS 1</item>
+        <item>LH BUS 2</item>
+        <item>MBH2</item>
     </string-array>
 
     <string-array name="to_whom_options">

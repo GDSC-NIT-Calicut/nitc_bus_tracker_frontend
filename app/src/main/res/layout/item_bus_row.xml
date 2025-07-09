@@ -33,16 +33,13 @@
                 android:textStyle="bold"
                 android:textColor="#222222" />
 
-            <!-- Status text (e.g. NOT RUNNING), hidden by default -->
-            <TextView
-                android:id="@+id/statusText"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/toggleSharingButton"
                 android:layout_width="wrap_content"
+                android:textSize="18dp"
                 android:layout_height="wrap_content"
-                android:text="NOT RUNNING"
-                android:textColor="#FF0000"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:visibility="gone" />
+                android:text="Disable"
+                android:background="@drawable/rounded_except_top_right" />
 
         </LinearLayout>
 
@@ -133,4 +130,13 @@
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="@color/black"
+        android:indeterminate="true"
+        android:visibility="invisible"
+        android:layout_gravity="center"/>
 </androidx.cardview.widget.CardView>

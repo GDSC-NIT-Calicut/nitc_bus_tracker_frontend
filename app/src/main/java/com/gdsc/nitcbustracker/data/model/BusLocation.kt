@@ -4,5 +4,6 @@ data class BusLocation(
     val bus_id: String,
     val latitude: Double,
     val longitude: Double,
-    val timestamp: String
+    val timestamp: String,
+    val isSharing: Boolean
 )

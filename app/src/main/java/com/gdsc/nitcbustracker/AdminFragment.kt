@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,8 +33,6 @@ class AdminFragment : Fragment() {
         recyclerView = view.findViewById(R.id.busStatusRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireActivity())
         fetchBusStatuses()
-
-
     }
 
     private fun fetchBusStatuses() {
@@ -45,7 +44,7 @@ class AdminFragment : Fragment() {
 
                 if (response.isSuccessful) {
                     val busList = response.body() ?: emptyList()
-                    adapter = BusStatusAdapter(busList)
+                    val adapter = BusStatusAdapter(busList, viewLifecycleOwner.lifecycleScope)
                     recyclerView.adapter = adapter
                 } else {
                     Toast.makeText(requireActivity(), "Failed to fetch bus data", Toast.LENGTH_SHORT).show()

@@ -10,6 +10,7 @@ import com.gdsc.nitcbustracker.data.model.LoginResponse
 import com.gdsc.nitcbustracker.data.model.Notice
 import com.gdsc.nitcbustracker.data.model.RegisterRequest
 import com.gdsc.nitcbustracker.data.model.RouteStop
+import com.gdsc.nitcbustracker.data.model.SharingStatus
 import com.gdsc.nitcbustracker.data.model.Stop
 import com.gdsc.nitcbustracker.data.model.UserInfo
 import okhttp3.ResponseBody
@@ -23,6 +24,13 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
+
+    @GET("/api/admin/get-sharing-status")
+    suspend fun getSharingStatus(@Query("busId") busId: String): Response<SharingStatus>
+
+    @POST("/api/admin/set-sharing-status")
+    suspend fun setSharingStatus(@Query("bus_id") busId: String, @Query("isSharing") status: Boolean): Response<GenericResponse>
+
     @GET("/api/bus/get")
     suspend fun getBusDetails(@Query("busId") busId: String): Response<Bus>
 

@@ -9,11 +9,15 @@ import android.view.*
 import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.gdsc.nitcbustracker.data.model.BusLocation
+import com.gdsc.nitcbustracker.data.model.SharingStatus
 import jp.wasabeef.blurry.Blurry
+import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -25,7 +29,7 @@ class DriverTrackingFragment : Fragment(), OnMapReadyCallback {
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
     private var locationUpdatesStarted = false
-    private lateinit var selectedHostel: String
+    private lateinit var selectedBus: String
 
     private lateinit var mapView: MapView
     private lateinit var blurredMap: ImageView
@@ -33,6 +37,7 @@ class DriverTrackingFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var enableToggle: TextView
     private lateinit var disableToggle: TextView
+    var isSharingEnabled: Boolean = true
 
     companion object {
         private const val MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey"
@@ -75,11 +80,11 @@ class DriverTrackingFragment : Fragment(), OnMapReadyCallback {
             override fun onItemSelected(
                 parent: AdapterView<*>, v: View?, position: Int, id: Long
             ) {
-                selectedHostel = parent.getItemAtPosition(position).toString()
+                selectedBus = parent.getItemAtPosition(position).toString()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
-                selectedHostel = ""
+                selectedBus = ""
             }
         }
 
@@ -87,11 +92,44 @@ class DriverTrackingFragment : Fragment(), OnMapReadyCallback {
         selectDisable()
 
         enableToggle.setOnClickListener {
-            if (::selectedHostel.isInitialized && selectedHostel.isNotEmpty()) {
-                startLocationUpdates()
-                selectEnable()
+            if (::selectedBus.isInitialized && selectedBus.isNotEmpty()) {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    try {
+                        val response = api.getSharingStatus(selectedBus)
+                        if (response.isSuccessful) {
+                            val isSharing = response.body()?.isSharing == true
+                            if (isSharing) {
+                                startLocationUpdates()
+                                selectEnable()
+                            } else {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Admin disabled your location sharing",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                selectDisable()
+                            }
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                "Failed: ${response.code()} ${response.message()}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    } catch (e: Error){
+                        Toast.makeText(
+                            requireContext(),
+                            "Catch",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
             } else {
-                Toast.makeText(requireContext(), "Select a hostel before enabling tracking", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "Select a Bus before enabling tracking",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -106,10 +144,11 @@ class DriverTrackingFragment : Fragment(), OnMapReadyCallback {
             override fun onLocationResult(locationResult: LocationResult) {
                 val location = locationResult.lastLocation ?: return
                 val loc = BusLocation(
-                    bus_id = selectedHostel,
+                    bus_id = selectedBus,
                     latitude = location.latitude,
                     longitude = location.longitude,
-                    timestamp = location.time.toString()
+                    timestamp = location.time.toString(),
+                    isSharing = isSharingEnabled
                 )
                 api.sendLocation(loc).enqueue(object : Callback<ResponseBody> {
                     override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
