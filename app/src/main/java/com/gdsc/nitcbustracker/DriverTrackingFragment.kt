@@ -1,34 +1,34 @@
 package com.gdsc.nitcbustracker
 
-import com.gdsc.nitcbustracker.data.network.RetrofitClient.api
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.location.*
+import com.gdsc.nitcbustracker.data.network.RetrofitClient.api
+import com.gdsc.nitcbustracker.services.LocationService
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
-import com.gdsc.nitcbustracker.data.model.BusLocation
-import com.gdsc.nitcbustracker.data.model.SharingStatus
 import jp.wasabeef.blurry.Blurry
 import kotlinx.coroutines.launch
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
+import androidx.core.content.edit
 
 class DriverTrackingFragment : Fragment(), OnMapReadyCallback {
 
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var locationRequest: LocationRequest
-    private lateinit var locationCallback: LocationCallback
-    private var locationUpdatesStarted = false
     private lateinit var selectedBus: String
 
     private lateinit var mapView: MapView
@@ -37,10 +37,12 @@ class DriverTrackingFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var enableToggle: TextView
     private lateinit var disableToggle: TextView
-    var isSharingEnabled: Boolean = true
+
+    private var adminCheckerJob: Job? = null
 
     companion object {
         private const val MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey"
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 101
     }
 
     override fun onCreateView(
@@ -50,8 +52,13 @@ class DriverTrackingFragment : Fragment(), OnMapReadyCallback {
         return inflater.inflate(R.layout.fragment_driver_tracking, container, false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val prefs = requireContext().getSharedPreferences("bus_tracker_prefs", 0)
+        val savedBus = prefs.getString("selected_bus", "") ?: ""
+        val isEnabled = prefs.getBoolean("is_location_sharing_enabled", false)
 
         mapView = view.findViewById(R.id.mapView)
         blurredMap = view.findViewById(R.id.blurredMap)
@@ -59,11 +66,9 @@ class DriverTrackingFragment : Fragment(), OnMapReadyCallback {
         enableToggle = view.findViewById(R.id.btnEnable)
         disableToggle = view.findViewById(R.id.btnDisable)
 
-        var mapViewBundle: Bundle? = savedInstanceState?.getBundle(MAP_VIEW_BUNDLE_KEY)
+        val mapViewBundle: Bundle? = savedInstanceState?.getBundle(MAP_VIEW_BUNDLE_KEY)
         mapView.onCreate(mapViewBundle)
         mapView.getMapAsync(this)
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
         val spinner = view.findViewById<Spinner>(R.id.busList)
 
@@ -88,77 +93,90 @@ class DriverTrackingFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-        // Initialize toggle state: Disabled selected by default
-        selectDisable()
+        if (savedBus.isNotEmpty()) {
+            selectedBus = savedBus
 
-        enableToggle.setOnClickListener {
-            if (::selectedBus.isInitialized && selectedBus.isNotEmpty()) {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    try {
-                        val response = api.getSharingStatus(selectedBus)
-                        if (response.isSuccessful) {
-                            val isSharing = response.body()?.isSharing == true
-                            if (isSharing) {
-                                startLocationUpdates()
-                                selectEnable()
-                            } else {
-                                Toast.makeText(
-                                    requireContext(),
-                                    "Admin disabled your location sharing",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                                selectDisable()
-                            }
-                        } else {
-                            Toast.makeText(
-                                requireContext(),
-                                "Failed: ${response.code()} ${response.message()}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    } catch (e: Error){
-                        Toast.makeText(
-                            requireContext(),
-                            "Catch",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
+            if (isEnabled) {
+                selectEnable()
+                startAdminChecker()
             } else {
-                Toast.makeText(
-                    requireContext(),
-                    "Select a Bus before enabling tracking",
-                    Toast.LENGTH_SHORT
-                ).show()
+                stopLocationService()
+                selectDisable()
+                stopAdminChecker()
             }
-        }
-
-        disableToggle.setOnClickListener {
-            stopLocationUpdates()
+        } else {
+            stopLocationService()
             selectDisable()
         }
 
-        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000).build()
 
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                val location = locationResult.lastLocation ?: return
-                val loc = BusLocation(
-                    bus_id = selectedBus,
-                    latitude = location.latitude,
-                    longitude = location.longitude,
-                    timestamp = location.time.toString(),
-                    isSharing = isSharingEnabled
-                )
-                api.sendLocation(loc).enqueue(object : Callback<ResponseBody> {
-                    override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                        Toast.makeText(requireContext(), "Location sent", Toast.LENGTH_SHORT).show()
+        enableToggle.setOnClickListener {
+                saveSharingState(true)
+                if (::selectedBus.isInitialized && selectedBus.isNotEmpty()) {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        try {
+                            val response = api.getSharingStatus(selectedBus)
+                            if (response.isSuccessful) {
+                                val isSharing = response.body()?.isSharing == true
+                                if (isSharing) {
+                                    startLocationService()
+                                    selectEnable()
+                                } else {
+                                    stopLocationService()
+                                    selectDisable()
+                                }
+                            } else {
+                                stopLocationService()
+                                selectDisable()
+                            }
+                        } catch (e: Exception) {
+                            stopLocationService()
+                            selectDisable()
+                        }
                     }
+                } else {
+                    // No bus selected yet, disable location sharing by default
+                    stopLocationService()
+                    selectDisable()
+                }
+            }
 
-                    override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                        Toast.makeText(requireContext(), "Failed to send location", Toast.LENGTH_SHORT).show()
-                    }
-                })
+        disableToggle.setOnClickListener {
+            saveSharingState(false)
+            stopLocationService()
+            stopAdminChecker()
+            selectDisable()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun startLocationService() {
+        val intent = Intent(requireContext(), LocationService::class.java)
+        intent.putExtra("bus_id", selectedBus)
+        requireContext().startForegroundService(intent)
+    }
+
+    private fun stopLocationService() {
+        val intent = Intent(requireContext(), LocationService::class.java).apply {
+            action = "STOP"
+        }
+        requireContext().startService(intent)
+    }
+
+    private fun hasLocationPermission(): Boolean {
+        return ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(requireContext(), "Permission granted", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -169,7 +187,6 @@ class DriverTrackingFragment : Fragment(), OnMapReadyCallback {
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(nitc, 16f))
 
         map.setOnMapLoadedCallback {
-            // Start with blurredMap invisible
             blurredMap.alpha = 0f
             blurredMap.visibility = View.VISIBLE
 
@@ -180,10 +197,9 @@ class DriverTrackingFragment : Fragment(), OnMapReadyCallback {
                         .from(bitmap)
                         .into(blurredMap)
 
-                    // Animate fade-in of blurred overlay
                     blurredMap.animate()
                         .alpha(1f)
-                        .setDuration(1000) // 1 second fade-in
+                        .setDuration(1000)
                         .start()
                 } else {
                     Toast.makeText(requireContext(), "Map snapshot failed", Toast.LENGTH_SHORT).show()
@@ -192,34 +208,13 @@ class DriverTrackingFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(
-                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            Toast.makeText(requireContext(), "Location permission not granted", Toast.LENGTH_SHORT).show()
-            return
-        }
-        if (!locationUpdatesStarted) {
-            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, requireActivity().mainLooper)
-            locationUpdatesStarted = true
-        }
-    }
-
-    private fun stopLocationUpdates() {
-        if (locationUpdatesStarted) {
-            fusedLocationClient.removeLocationUpdates(locationCallback)
-            locationUpdatesStarted = false
-        }
-    }
-
     private fun selectEnable() {
         enableToggle.apply {
-            setBackgroundResource(R.drawable.toggle_right_selected) // Make sure you have this drawable
+            setBackgroundResource(R.drawable.toggle_right_selected)
             setTextColor(Color.WHITE)
         }
         disableToggle.apply {
-            setBackgroundResource(R.drawable.toggle_left_unselected) // Make sure you have this drawable
+            setBackgroundResource(R.drawable.toggle_left_unselected)
             setTextColor(Color.BLACK)
         }
     }
@@ -235,39 +230,10 @@ class DriverTrackingFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    // Lifecycle methods below...
-
-    override fun onResume() {
-        super.onResume()
-        mapView.onResume()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        mapView.onStart()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        mapView.onStop()
-    }
-
-    override fun onPause() {
-        mapView.onPause()
-        super.onPause()
-    }
-
-    override fun onDestroy() {
-        mapView.onDestroy()
-        fusedLocationClient.removeLocationUpdates(locationCallback)
-        super.onDestroy()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView.onLowMemory()
-    }
-
+    override fun onResume() { super.onResume(); mapView.onResume() }
+    override fun onPause() { mapView.onPause(); super.onPause() }
+    override fun onDestroy() { mapView.onDestroy(); super.onDestroy() }
+    override fun onLowMemory() { super.onLowMemory(); mapView.onLowMemory() }
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         var mapViewBundle = outState.getBundle(MAP_VIEW_BUNDLE_KEY)
@@ -276,5 +242,66 @@ class DriverTrackingFragment : Fragment(), OnMapReadyCallback {
             outState.putBundle(MAP_VIEW_BUNDLE_KEY, mapViewBundle)
         }
         mapView.onSaveInstanceState(mapViewBundle)
+    }
+
+    private fun startAdminChecker() {
+        adminCheckerJob?.cancel()
+        adminCheckerJob = viewLifecycleOwner.lifecycleScope.launch {
+            while (true) {
+                delay(5000)
+                try {
+                    val response = api.getSharingStatus(selectedBus)
+                    if (response.isSuccessful) {
+                        val isSharingAllowed = response.body()?.isSharing == true
+                        if (!isSharingAllowed) {
+                            Toast.makeText(requireContext(), "Admin has disabled sharing", Toast.LENGTH_LONG).show()
+                            stopLocationService()
+                            stopAdminChecker()
+                            selectDisable()
+                            return@launch
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
+    private fun stopAdminChecker() {
+        adminCheckerJob?.cancel()
+        adminCheckerJob = null
+    }
+
+    private fun saveSharingState(enabled: Boolean) {
+        val prefs = requireContext().getSharedPreferences("bus_tracker_prefs", 0)
+        prefs.edit {
+            putBoolean("is_location_sharing_enabled", enabled)
+                .putString("selected_bus", selectedBus)
+        }
+    }
+
+    private val adminDisabledReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            Toast.makeText(requireContext(), "Admin disabled your location sharing", Toast.LENGTH_LONG).show()
+            selectDisable()
+            stopLocationService()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    override fun onStart() {
+        super.onStart()
+        requireContext().registerReceiver(
+            adminDisabledReceiver,
+            IntentFilter("com.gdsc.nitcbustracker.ADMIN_DISABLED"),
+            Context.RECEIVER_NOT_EXPORTED
+            )
+    }
+
+
+    override fun onStop() {
+        super.onStop()
+        requireContext().unregisterReceiver(adminDisabledReceiver)
     }
 }
