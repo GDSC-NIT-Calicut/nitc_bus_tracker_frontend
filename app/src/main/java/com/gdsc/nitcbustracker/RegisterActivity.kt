@@ -68,6 +68,12 @@ class RegisterActivity : AppCompatActivity() {
             val hostel = spinnerRole.selectedItem.toString().uppercase()
             val phone = etPhone.text.toString().trim()
 
+            if (phone.length < 10){
+                Toast.makeText(this, "Invalid phone number", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+
             if (email.isEmpty() || password.isEmpty() || username.isEmpty() || phone.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
