@@ -33,7 +33,7 @@ android {
         applicationId = "com.gdsc.nitcbustracker"
         minSdk = 24
         targetSdk = 35
-        versionCode = 7
+        versionCode = 9
         versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
