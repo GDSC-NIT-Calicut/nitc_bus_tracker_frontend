@@ -123,6 +123,7 @@ class NewNoticeFragment : Fragment() {
 
                 call?.enqueue(object : Callback<Void> {
                     override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                        if (!isAdded) return
                         if (response.isSuccessful) {
                             Toast.makeText(requireActivity(), "Notification sent", Toast.LENGTH_SHORT).show()
                         } else {
@@ -152,10 +153,9 @@ class NewNoticeFragment : Fragment() {
                     Toast.makeText(requireActivity(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                     showProgress(false)
                 }
+                Toast.makeText(requireActivity(), "Successfully Notice Sent to: $toWhom", Toast.LENGTH_LONG).show()
                 requireActivity().supportFragmentManager.popBackStack()
             }
-
-            Toast.makeText(requireActivity(), "Successfully Notice Sent to: $toWhom", Toast.LENGTH_LONG).show()
         }
     }
 
